@@ -1,0 +1,19 @@
+parameters: #在模板文件中，使用 parameters 部分（而不是 variables）来定义输入。
+  buildConfiguration: 'Release'
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: 'Build the project - ${{ parameters.buildConfiguration }}' #在模板文件中，使用 ${{ }} 语法（而不是 $()）来读取参数值。 读取参数的值时，将在其名称中包含 parameters 部分。 例如 ${{ parameters.buildConfiguration }}。
+  inputs:
+    command: 'build'
+    arguments: '--no-restore --configuration ${{ parameters.buildConfiguration }}' #在模板文件中，使用 ${{ }} 语法（而不是 $()）来读取参数值。 读取参数的值时，将在其名称中包含 parameters 部分。 例如 ${{ parameters.buildConfiguration }}。
+    projects: '**/*.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish the project - ${{ parameters.buildConfiguration }}'
+  inputs:
+    command: 'publish'
+    projects: '**/*.csproj'
+    publishWebProjects: false
+    arguments: '--no-build --configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)/${{ parameters.buildConfiguration }}'
+    zipAfterPublish: true
